@@ -223,6 +223,8 @@ jobs:
           marker='Java_com_arm_aichat_internal_InferenceEngineImpl_processUserPrompt'
           pos=s.find(marker)
           head, tail = s[:pos], s[pos:]
+          tail=tail.replace('// Reset short-term states\n    reset_short_term_states();',
+                            '// Reset long-term & short-term states for clean single-turn translation\n    reset_long_term_states(true);\n    reset_short_term_states();',1)
           tail=tail.replace('const bool has_chat_template = common_chat_templates_was_explicit(g_chat_templates.get());',
                             'const bool has_chat_template = false; // Lite13 raw MT prompt',1)
           tail=tail.replace('common_tokenize(g_context, formatted_user_prompt, has_chat_template, has_chat_template)',
