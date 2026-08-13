@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 120
     env:
       GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx6g -Dfile.encoding=UTF-8
-      LLAMA_COMMIT: 0b1bad14ff204627636aeb1de22ddcd5acb859d4
+      LLAMA_COMMIT: ba360efe1f574ebae727aad64112d18ecedca85a
       TESSDATA_COMMIT: 87416418657359cb625c412a48b6e1d6d41c29bd
 
     steps:

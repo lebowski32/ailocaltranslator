@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      LLAMA_COMMIT: 0b1bad14ff204627636aeb1de22ddcd5acb859d4
+      LLAMA_COMMIT: ba360efe1f574ebae727aad64112d18ecedca85a
 
     steps:
       - name: Checkout DANIIL builder branch
@@ -294,7 +294,7 @@ jobs:
           Included:
           - RTranslator v3.00 Android application source with Lite13 patches already applied;
           - all recursively checked-out RTranslator source submodules;
-          - exact llama.cpp source at commit 0b1bad14ff204627636aeb1de22ddcd5acb859d4 with the Lite13 Android native changes already applied;
+          - exact llama.cpp source at commit ba360efe1f574ebae727aad64112d18ecedca85a with the Lite13 Android native changes already applied;
           - DANIIL patch scripts and Lite13 CI/build workflows under `DANIIL-builder/`;
           - upstream, submodule, llama.cpp, and DANIIL builder revision manifests.
 
