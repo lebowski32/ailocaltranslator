@@ -24,10 +24,14 @@ replacement_load = '''    public void load() throws Exception {
                 String nativeDir = global.getApplicationInfo().nativeLibraryDir;
                 java.io.File nativeLib = new java.io.File(nativeDir, "libai-chat.so");
                 if (!nativeLib.exists()) {
-                    lastLoadError = "Native library libai-chat.so not found in " + nativeDir
-                            + ". The llama-android-lite10.aar is missing from app/libs/. "
-                            + "Run prepare_dependencies.sh to download it.";
-                    throw new IllegalStateException(lastLoadError);
+                    try {
+                        System.loadLibrary("ai-chat");
+                        Log.i(TAG, "libai-chat.so loaded directly via System.loadLibrary");
+                    } catch (Throwable tLoad) {
+                        lastLoadError = "Native library libai-chat.so not found in " + nativeDir
+                                + " and System.loadLibrary failed: " + tLoad.getMessage();
+                        throw new IllegalStateException(lastLoadError);
+                    }
                 }
             } catch (IllegalStateException e) {
                 throw e;
@@ -55,17 +59,29 @@ if translator_file.exists():
                     String nativeDir = global.getApplicationInfo().nativeLibraryDir;
                     java.io.File ortLib = new java.io.File(nativeDir, "libonnxruntime.so");
                     if (!ortLib.exists()) {
-                        String msg = "ONNX Runtime native library not found in " + nativeDir
-                                + ". The onnxruntime-android-1.27.1-full-arm64.aar is missing "
-                                + "from app/libs/. Run prepare_dependencies.sh to download it.";
-                        Log.e("RTranslatorLite13", msg);
-                        mainHandler.post(() -> initListener.onFailure(new int[]{ErrorCodes.ERROR_LOADING_MODEL}, 0));
-                        return;
+                        try {
+                            System.loadLibrary("onnxruntime");
+                            Log.i("RTranslatorLite13", "libonnxruntime.so loaded directly via System.loadLibrary");
+                        } catch (Throwable tOrt) {
+                            String msg = "ONNX Runtime native library not found in " + nativeDir
+                                    + " and System.loadLibrary failed: " + tOrt.getMessage();
+                            Log.e("RTranslatorLite13", msg);
+                            mainHandler.post(() -> initListener.onFailure(new int[]{ErrorCodes.ERROR_LOADING_MODEL}, 0));
+                            return;
+                        }
                     }
                     Log.i("RTranslatorLite13", "Initializing matched ONNX Runtime 1.27.1");'''
     if ort_needle in te:
         te = te.replace(ort_needle, ort_replacement, 1)
         translator_file.write_text(te, encoding="utf-8")
+
+manifest_file = ROOT / "app/src/main/AndroidManifest.xml"
+if manifest_file.exists():
+    m = manifest_file.read_text(encoding="utf-8")
+    if 'android:extractNativeLibs=' not in m:
+        m = m.replace('<application\n', '<application\n        android:extractNativeLibs="true"\n', 1)
+        manifest_file.write_text(m, encoding="utf-8")
+
 
 
 # Separate Lite13 package so Lite12 remains installable for comparison.
